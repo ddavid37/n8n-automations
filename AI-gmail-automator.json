@@ -1,18 +1,35 @@
 {
-  "name": "AI Email Organizer - Daniel Custom Labels",
+  "name": "AI Email Organizer - Daniel Full Automation",
   "nodes": [
     {
       "parameters": {
         "pollTimes": {
-          "item": [{ "mode": "everyMinute" }]
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
         },
-        "filters": { "labelIds": ["INBOX"] }
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ]
+        }
       },
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.2,
-      "position": [-960, 368],
-      "id": "dc3d90ac-3141-42cb-a7b0-339309c53911",
-      "name": "Gmail Trigger"
+      "position": [
+        0,
+        0
+      ],
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UBLkZbM53L8HYIVm",
+          "name": "Gmail 1957000"
+        }
+      }
     },
     {
       "parameters": {
@@ -21,60 +38,77 @@
           "categories": [
             {
               "category": "דחוף",
-              "description": "הודעות קריטיות על קבלה לעבודה (Job Offers), השלמת מסמכים (I-9), או עדכונים דחופים מ-Columbia ו-Rhino Health."
+              "description": "הודעות על קבלה לעבודה (Job Offers), בקשות להשלמת מסמכים לתהליך הגיוס (I-9, חוזים), ועדכונים קריטיים מהאוניברסיטה או מהעבודה."
             },
             {
               "category": "Job Applications",
-              "description": "מיילים הקשורים לתהליכי גיוס, ראיונות ועדכוני סטטוס משרות."
+              "description": "מיילים כלליים על תהליכי מיון, זימונים לראיונות ועדכוני סטטוס משרות."
             },
             {
               "category": "Purchases",
-              "description": "קבלות, אישורי הזמנה וחשבוניות (כמו אלו שמופיעים בתיקיית ה-Purchases שלך)."
+              "description": "קבלות, אישורי הזמנה ופרטי תשלום. מיילים אלו יסומנו כנקראו ויאורכבו."
             },
             {
               "category": "Updates",
-              "description": "עדכונים אוטומטיים, ניוזלטרים או הודעות מערכת שאינן דורשות פעולה."
+              "description": "מיילים אוטומטיים ממערכות, ניוזלטרים או עדכוני סטטוס שאינם דורשים תגובה."
             },
             {
               "category": "Malicious",
-              "description": "מיילים חשודים, ניסיונות פישינג או ספאם בוטה."
+              "description": "מיילים חשודים, פישינג או ספאם."
+            },
+            {
+              "category": "רגיל",
+              "description": "מיילים אישיים או הודעות שאינן נופלות תחת הקטגוריות האחרות."
             }
           ]
         }
       },
       "type": "@n8n/n8n-nodes-langchain.textClassifier",
       "typeVersion": 1,
-      "position": [-688, 368],
-      "id": "c386fcb6-001d-43a7-9ca8-18862ecc06c8",
+      "position": [
+        250,
+        0
+      ],
+      "id": "classifier",
       "name": "Text Classifier"
     },
     {
       "parameters": {
-        "model": { "value": "gpt-4o-mini" }
+        "model": {
+          "value": "gpt-4o-mini"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
-      "position": [-736, 736],
-      "id": "7f8cb1be-fe13-4bdb-ad79-90de5d3e85d3",
-      "name": "OpenAI Chat Model"
+      "position": [
+        200,
+        250
+      ],
+      "id": "openai-model",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ADDMcLS7h4sSW6vR",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "update",
         "messageId": "={{$node[\"Gmail Trigger\"].json[\"id\"]}}",
-        "addLabelIds": ["={{$node[\"Text Classifier\"].json[\"category\"]}}"],
-        "removeLabelIds": ["INBOX"]
+        "addLabelIds": [
+          "={{$node[\"Text Classifier\"].json[\"category\"]}}"
+        ],
+        "removeLabelIds": [
+          "INBOX"
+        ]
       },
       "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.1,
-      "position": [-350, 368],
-      "id": "gmail-action-node",
-      "name": "הוסף ל-Label וארכב"
-    }
-  ],
-  "connections": {
-    "Gmail Trigger": { "main": [[{ "node": "Text Classifier", "type": "main", "index": 0 }]] },
-    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "Text Classifier", "type": "ai_languageModel", "index": 0 }]] },
-    "Text Classifier": { "main": [[{ "node": "הוסף ל-Label וארכב", "type": "main", "index": 0 }]] }
-  }
-}
+      "typeVersion": 2.2,
+      "position": [
+        550,
+        0
+      ],
+      "id": "tag-and-archive",
+      "name":
