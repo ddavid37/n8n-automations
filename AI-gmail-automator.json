@@ -18,10 +18,7 @@
       },
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.2,
-      "position": [
-        0,
-        0
-      ],
+      "position": [0, 0],
       "id": "gmail-trigger",
       "name": "Gmail Trigger",
       "credentials": {
@@ -50,7 +47,7 @@
             },
             {
               "category": "Updates",
-              "description": "מיילים אוטומטיים ממערכות, ניוזלטרים או עדכוני סטטוס שאינם דורשים תגובה."
+              "description": "מיילים אוטומטיים ממערכות, ניוזלטרים או עדכוני סטטוס שאינם דורשות פעולה."
             },
             {
               "category": "Malicious",
@@ -65,10 +62,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.textClassifier",
       "typeVersion": 1,
-      "position": [
-        250,
-        0
-      ],
+      "position": [250, 0],
       "id": "classifier",
       "name": "Text Classifier"
     },
@@ -80,10 +74,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
-      "position": [
-        200,
-        250
-      ],
+      "position": [200, 250],
       "id": "openai-model",
       "name": "OpenAI Chat Model",
       "credentials": {
@@ -106,9 +97,79 @@
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
-      "position": [
-        550,
-        0
-      ],
+      "position": [550, 0],
       "id": "tag-and-archive",
-      "name":
+      "name": "Tag & Archive",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UBLkZbM53L8HYIVm",
+          "name": "Gmail 1957000"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{$node[\"Gmail Trigger\"].json[\"id\"]}}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [800, 0],
+      "id": "mark-as-read",
+      "name": "Mark as Read",
+      "executeCondition": "={{['Purchases', 'Updates', 'Malicious'].includes($node[\"Text Classifier\"].json[\"category\"])}}",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UBLkZbM53L8HYIVm",
+          "name": "Gmail 1957000"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Tag & Archive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag & Archive": {
+      "main": [
+        [
+          {
+            "node": "Mark as Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
